@@ -111,8 +111,7 @@
 
 - name: Now get the latest one
    set_fact:
-     latest_ami: >
-       {{ debian_ami.images | sort(attribute='creation_date') | last }}
+     latest_ami: "{{ debian_ami.images | sort(attribute='creation_date') | last }}"
 
 #---- Launch EC2 instance ----
 - name: Launch an EC2 instance
