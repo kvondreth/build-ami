@@ -218,8 +218,8 @@
     mode: 0644
     remote_src: true
 
- - name: Install SSM
-   command: chroot {{ INSTALL_ROOT }} dpkg -i /tmp/amazon-ssm-agent.deb
+- name: Install SSM
+  command: chroot {{ INSTALL_ROOT }} dpkg -i /tmp/amazon-ssm-agent.deb
 
 # ---- Unmount all mounts ----
 - name: Unmount {{ INSTALL_ROOT }}/boot
