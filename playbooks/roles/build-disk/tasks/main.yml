@@ -14,11 +14,11 @@
     path: "{{ temp_ssm }}"
     state: directory
 
- - name: Download SSM
-   get_url:
-     url: https://s3.eu-central-1.amazonaws.com/amazon-ssm-eu-central-1/latest/debian_amd64/amazon-ssm-agent.deb
-     dest: "{{ temp_ssm }}/amazon-ssm-agent.deb"
-     mode: 0644    
+- name: Download SSM
+  get_url:
+    url: https://s3.eu-central-1.amazonaws.com/amazon-ssm-eu-central-1/latest/debian_amd64/amazon-ssm-agent.deb
+    dest: "{{ temp_ssm }}/amazon-ssm-agent.deb"
+    mode: 0644    
 
 - name: update sources.list
   copy:
