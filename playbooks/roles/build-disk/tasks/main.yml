@@ -9,6 +9,17 @@
     path: "/etc/apt/sources.list.d"
     state: absent
 
+- name: Creating SSM directory in tmp
+   file:
+     path: "{{ temp_ssm }}"
+     state: directory
+
+ - name: Download SSM
+   get_url:
+     url: https://s3.eu-central-1.amazonaws.com/amazon-ssm-eu-central-1/latest/debian_amd64/amazon-ssm-agent.deb
+     dest: "{{ temp_ssm }}/amazon-ssm-agent.deb"
+     mode: 0644    
+
 - name: update sources.list
   copy:
     src: "files/sources.list"
@@ -26,9 +37,6 @@
       - e2fsprogs
       - gnupg
     state: present
-
-- name: Load aufs module
-  shell: modprobe aufs
 
 # ---- Set up the specified ISO release ----
 
@@ -149,8 +157,8 @@
   mount:
     name: "{{ INSTALL_ROOT }}"
     src: none
-    fstype: aufs
-    opts: "noatime,dirs={{ RW_DIR.path }}=rw:{{ READ_ROOT }}=rr"
+    fstype: overlay
+    opts: "noatime,upperdir={{ RW_DIR.path }},lowerdir={{ READ_ROOT }},workdir={{ WRITE_ROOT }}/boot/{{ version_string.stdout }}/work/work"
     state: mounted
 
 # ---- Post image installation tasks ----
@@ -202,6 +210,16 @@
     src: templates/persistence.conf
     dest: "{{ WRITE_ROOT }}/persistence.conf"
     mode: 0644
+
+- name: Copy SSM package
+   copy:
+     src: "{{ temp_ssm }}/amazon-ssm-agent.deb"
+     dest: "{{ INSTALL_ROOT }}/tmp/amazon-ssm-agent.deb"
+     mode: 0644
+     remote_src: true
+
+ - name: Install SSM
+   command: chroot {{ INSTALL_ROOT }} dpkg -i /tmp/amazon-ssm-agent.deb
 
 # ---- Unmount all mounts ----
 - name: Unmount {{ INSTALL_ROOT }}/boot
